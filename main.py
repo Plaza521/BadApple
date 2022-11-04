@@ -1,10 +1,11 @@
 from time import time, sleep
 from os import system
 from ctypes import *
+import json
 
 
 class MainSettings:
-    FPS = 5
+    FPS = 6
 
 
 STD_OUTPUT_HANDLE = -11
@@ -49,8 +50,8 @@ class Video:
 
 def main():
     print("Loading video...")
-    with open("frames.txt") as f:
-        frames = eval(f.read())
+    with open("frames.json") as f:
+        frames = json.load(f)["data"]
     system("cls")
     print("Successful")
     Video(frames).start()
