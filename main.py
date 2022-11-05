@@ -1,23 +1,26 @@
 from time import time, sleep
 from os import system
-from ctypes import *
+from sys import platform, argv
 import json
 
 
 class MainSettings:
-    FPS = 6
+    FPS = 5
 
 
-STD_OUTPUT_HANDLE = -11
-STDHANDLE = windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+if platform == "win32":
+    from ctypes import *
+    STD_OUTPUT_HANDLE = -11
+    STDHANDLE = windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
 
+    class COORDSET(Structure):
+        _fields_ = [("X", c_long), ("Y", c_long)]
 
-class COORDSET(Structure):
-    _fields_ = [("X", c_long), ("Y", c_long)]
-
-
-def set_cursor_position(x: int, y: int) -> None:
-    windll.kernel32.SetConsoleCursorPosition(STDHANDLE, COORDSET(x, y))
+    def set_cursor_position(x: int, y: int) -> None:
+        windll.kernel32.SetConsoleCursorPosition(STDHANDLE, COORDSET(x, y))
+else:
+    def set_cursor_position(x: int, y: int) -> None:
+        print(f"\033[{x};{y}H")
 
 
 class VideoPlayer:
@@ -49,8 +52,11 @@ class Video:
 
 
 def main():
+    if len(argv) != 2:
+        raise SystemExit(f"Usage: {argv[0]} <file>")
+
     print("Loading video...")
-    with open("frames.json") as f:
+    with open(argv[1]) as f:
         frames = json.load(f)["data"]
     system("cls")
     print("Successful")
